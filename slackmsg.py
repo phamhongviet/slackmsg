@@ -6,8 +6,9 @@ slackmsg handles sending messages via slack
 import sys
 import getopt
 from urllib import urlencode
-import pycurl
 import cStringIO
+
+import pycurl
 
 
 class SlackMsg(object):
