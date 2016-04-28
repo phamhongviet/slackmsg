@@ -7,6 +7,7 @@ import sys
 import getopt
 from urllib import urlencode
 import pycurl
+import cStringIO
 
 
 class SlackMsg(object):
@@ -27,7 +28,11 @@ class SlackMsg(object):
         curl = pycurl.Curl()
         curl.setopt(curl.POSTFIELDS, postdata)
         curl.setopt(curl.URL, self.hook)
+        message = cStringIO.StringIO()
+        curl.setopt(curl.WRITEFUNCTION, message.write)
         curl.perform()
+        if curl.getinfo(pycurl.HTTP_CODE) != 200:
+            raise ValueError('HTTP return code is not 200 OK: %s' % message.getvalue())
 
 
 if __name__ == "__main__":
@@ -70,4 +75,9 @@ if __name__ == "__main__":
     try:
         sm.send(flag_text)
     except NameError:
+        exit(1)
+    except ValueError as e:
+        print str(e)
+        exit(2)
+    except Exception:
         exit(2)
